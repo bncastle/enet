@@ -1,7 +1,5 @@
 Please visit the ENet homepage at http://enet.bespin.org for installation
 and usage instructions.
 
-This is a fork of lsalzman's github of enet which can be found at:
-https://github.com/lsalzman/enet
-
-I've added a Visual Studio Solution so that it builds under Windows
+I've added a Visual Studio Solution so that it builds under Windows and
+removed the Linux build files as I don;t need them.
