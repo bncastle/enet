@@ -138,7 +138,12 @@ enet_address_get_host_ip (const ENetAddress * address, char * name, size_t nameL
 #else
     char * addr = inet_ntoa (* (struct in_addr *) & address -> host);
     if (addr != NULL)
-        strncpy (name, addr, nameLength);
+    {
+        size_t addrLen = strlen(addr);
+        if (addrLen >= nameLength)
+          return -1;
+        memcpy (name, addr, addrLen + 1);
+    } 
     else
 #endif
         return -1;
@@ -170,8 +175,13 @@ enet_address_get_host (const ENetAddress * address, char * name, size_t nameLeng
 
     if (hostEntry == NULL)
       return enet_address_get_host_ip (address, name, nameLength);
-
-    strncpy (name, hostEntry -> h_name, nameLength);
+    else
+    {
+       size_t hostLen = strlen (hostEntry -> h_name);
+       if (hostLen >= nameLength)
+         return -1;
+       memcpy (name, hostEntry -> h_name, hostLen + 1);
+    }
 
     return 0;
 }
@@ -236,7 +246,7 @@ enet_socket_set_option (ENetSocket socket, ENetSocketOption option, int value)
     {
         case ENET_SOCKOPT_NONBLOCK:
 #ifdef HAS_FCNTL
-            result = fcntl (socket, F_SETFL, O_NONBLOCK | fcntl (socket, F_GETFL));
+            result = fcntl (socket, F_SETFL, (value ? O_NONBLOCK : 0) | (fcntl (socket, F_GETFL) & ~O_NONBLOCK));
 #else
             result = ioctl (socket, FIONBIO, & value);
 #endif
